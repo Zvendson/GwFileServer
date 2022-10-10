@@ -5,6 +5,7 @@
 #include <WinInet.h>
 #include <sys/types.h>
 #include "Protocol.h"
+#include "Decompression/xentax.h"
 
 
 struct FileRequest
@@ -15,10 +16,11 @@ struct FileRequest
 	uint32_t m_size_compressed   = 0;
 	uint32_t m_crc               = 0;
 	uint32_t m_size_downloaded   = 0;
-	bool     m_decompressed      = false;
 	uint8_t* m_buffer            = nullptr;
+	uint8_t* m_decompress_buffer = nullptr;
 
-	inline bool IsCompleted() { return m_size_downloaded >= m_size_compressed; }
+	inline bool IsDecompressed() { return m_decompress_buffer != 0; }
+	inline bool IsCompleted()    { return m_size_downloaded >= m_size_compressed; }
 	float GetSizeInPercent() 
 	{ 
 		if (m_size_compressed == 0)
@@ -29,6 +31,7 @@ struct FileRequest
 
 		return size_loaded / size_needed;
 	}
+	bool Decompress();
 };
 
 
@@ -51,7 +54,7 @@ private:
 	bool  SendRequestMore(uint32_t offset);
 	
 	int      Send(void* packet, int size);
-	uint16_t Recv(const unsigned int len);
+	uint16_t Recv(const uint32_t len);
 
 private:
 	#define MAX_BUFFER_LEN 0xFFFF

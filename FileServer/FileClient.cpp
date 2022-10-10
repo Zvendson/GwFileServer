@@ -168,10 +168,8 @@ bool FileClient::Download(uint32_t id, FileRequest* out, uint32_t curr_version)
 	file.m_crc               = details.crc;
 	file.m_size_downloaded   = 0;
 
-	int updater = 0;
-
 	// Download file
-	printf("    Downloading file: 0x%X (%d) CRC=0x%X\n", id, id, file.m_crc);
+	printf("Downloading file id: 0x%X (%d) CRC=0x%X\n", id, id, file.m_crc);
 	while (file.m_size_compressed > file.m_size_downloaded)
 	{
 		// Get file chunk
@@ -206,21 +204,18 @@ bool FileClient::Download(uint32_t id, FileRequest* out, uint32_t curr_version)
 		
 		if (file.m_size_downloaded < file.m_size_compressed)
 		{
-			if (!SendRequestMore(file.m_size_downloaded))
+			if (!SendRequestMore(size))
 			{
 				delete[] file.m_buffer;
 				return false;
 			}
 		}
 
-		if (updater % 10 == 0)
-			printf("     > Downloaded %6.2f%% (%d / %d)\n", file.GetSizeInPercent() * 100, file.m_size_downloaded, file.m_size_compressed);
-
-		updater++;
+		printf("     > Downloaded %6.2f%%\n", file.GetSizeInPercent() * 100);
 	}
 
 	memcpy(out, &file, sizeof(FileRequest));
-	printf("    > Download completed\n");
+	printf("Download completed!\n\n");
 
 	return true;
 }
@@ -250,12 +245,13 @@ bool FileClient::SendHandshake(CtoFS::GameType type)
 	}
 
 	m_handshakeData = *packet;
-
+	/*
 	printf("header      = 0x%X\n", m_handshakeData.header);
 	printf("size        = 0x%X\n", m_handshakeData.size);
 	printf("manifest_id = %d\n", m_handshakeData.asset_manifest_id);
 	printf("gw_exe_id   = %d\n", m_handshakeData.gw_exe_id);
 	printf("gw_exe_2_id = %d\n", m_handshakeData.ge_exe_2_id);
+	*/
 
 	return true;
 }
@@ -316,7 +312,7 @@ int      FileClient::Send(void* packet, int size)
 
     return sent_bytes;
 }
-uint16_t FileClient::Recv(const unsigned int len) 
+uint16_t FileClient::Recv(const uint32_t len) 
 {
 	assert(len < MAX_BUFFER_LEN);
     ZeroMemory(m_buffer, MAX_BUFFER_LEN);
@@ -350,3 +346,16 @@ uint16_t FileClient::Recv(const unsigned int len)
     return recv_bytes;
 }
 
+bool FileRequest::Decompress()
+{
+	Xentax xentax;
+	m_decompress_buffer = xentax.DecompressFile((unsigned int*)m_buffer, m_size_compressed, (int&)(m_size_decompressed));
+
+	if (!m_decompress_buffer || m_decompress_buffer[0] == '\0')
+	{
+		printf("Failed to decompress file 0x%X (%d)\n", m_file_id, m_file_id);
+		return false;
+	}
+
+	return true;
+}
