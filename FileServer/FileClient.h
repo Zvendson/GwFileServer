@@ -10,7 +10,6 @@
 
 struct FileRequest
 {
-
 	uint32_t m_file_id           = 0;
 	uint32_t m_size_decompressed = 0;
 	uint32_t m_size_compressed   = 0;
