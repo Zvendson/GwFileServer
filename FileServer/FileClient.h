@@ -5,7 +5,7 @@
 #include <WinInet.h>
 #include <sys/types.h>
 #include "Protocol.h"
-#include "Decompression/xentax.h"
+#include "Compression/xentax.h"
 
 
 struct FileRequest
