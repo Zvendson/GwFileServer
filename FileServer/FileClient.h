@@ -8,6 +8,19 @@
 #include "Compression/xentax.h"
 
 
+struct FFNA
+{
+
+};
+
+struct GwFile
+{
+	uint32_t m_file_id = 0;
+	uint32_t m_type    = 0;
+	uint32_t m_size    = 0;
+	uint8_t* m_data    = 0;
+};
+
 struct CompressedFile
 {
 	uint32_t m_file_id           = 0;
