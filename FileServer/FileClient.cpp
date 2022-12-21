@@ -136,7 +136,7 @@ bool FileClient::Close()
 	WSACleanup();
 	return true;	
 }
-bool FileClient::Download(uint32_t id, FileRequest* out, uint32_t curr_version)
+bool FileClient::Download(uint32_t id, CompressedFile* out, uint32_t curr_version)
 {
 	if (!IsConnected())
 		return false;
@@ -153,7 +153,7 @@ bool FileClient::Download(uint32_t id, FileRequest* out, uint32_t curr_version)
 	}
 
 	// Prepare memory to download file
-	FileRequest file;
+	CompressedFile file;
 	file.m_buffer =  new uint8_t[details.size_compressed + 1];
 
 	if (file.m_buffer == nullptr)
@@ -214,7 +214,9 @@ bool FileClient::Download(uint32_t id, FileRequest* out, uint32_t curr_version)
 		printf("     > Downloaded %6.2f%%\n", file.GetSizeInPercent() * 100);
 	}
 
-	memcpy(out, &file, sizeof(FileRequest));
+	file.Decompress();
+
+	memcpy(out, &file, sizeof(CompressedFile));
 	printf("Download completed!\n\n");
 
 	return true;
@@ -245,13 +247,13 @@ bool FileClient::SendHandshake(CtoFS::GameType type)
 	}
 
 	m_handshakeData = *packet;
-	/*
+	
 	printf("header      = 0x%X\n", m_handshakeData.header);
 	printf("size        = 0x%X\n", m_handshakeData.size);
 	printf("manifest_id = %d\n", m_handshakeData.asset_manifest_id);
 	printf("gw_exe_id   = %d\n", m_handshakeData.gw_exe_id);
 	printf("gw_exe_2_id = %d\n", m_handshakeData.ge_exe_2_id);
-	*/
+	
 
 	return true;
 }
@@ -346,7 +348,7 @@ uint16_t FileClient::Recv(const uint32_t len)
     return recv_bytes;
 }
 
-bool FileRequest::Decompress()
+bool CompressedFile::Decompress()
 {
 	Xentax xentax;
 	m_decompress_buffer = xentax.DecompressFile((unsigned int*)m_buffer, m_size_compressed, (int&)(m_size_decompressed));

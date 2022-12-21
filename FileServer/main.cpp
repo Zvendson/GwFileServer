@@ -40,7 +40,7 @@ int main(int argc, char const* argv[])
 			}
 			fileName = buffer;
 
-			FileRequest file;
+			CompressedFile file;
 			if (client.Download(file_id, &file))
 			{
 				if (file.Decompress())
@@ -51,6 +51,10 @@ int main(int argc, char const* argv[])
 					file_out.close();
 					printf("Download saved in '%s'\n", fileName.c_str());
 					delete[] file.m_decompress_buffer;
+				}
+				else
+				{
+					printf("Could not decompress file: 0x%X (%d)\n", file_id, file_id);
 				}
 				delete[] file.m_buffer;
 			}

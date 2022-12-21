@@ -8,7 +8,7 @@
 #include "Compression/xentax.h"
 
 
-struct FileRequest
+struct CompressedFile
 {
 	uint32_t m_file_id           = 0;
 	uint32_t m_size_decompressed = 0;
@@ -42,7 +42,7 @@ public:
 
 	bool Connect();
 	bool Close();
-	bool Download(uint32_t id, FileRequest* out, uint32_t curr_version = 0);
+	bool Download(uint32_t id, CompressedFile* out, uint32_t curr_version = 0);
 
 	inline bool   IsConnected() { return m_socket != 0; }
 	inline char*  GetDomain()   { return m_domain; }
