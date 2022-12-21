@@ -6,11 +6,11 @@
 #include <windows.h>
 
 int main(int argc, char const* argv[])
-{
+{ 
 	std::cout << "##########################\n";
 	std::cout << "# Guild Wars File Server #\n";
 	std::cout << "##########################\n\n";
-	std::cout << "Usage: Type id and name\nExample:\nFile id: 358542\nFile name: Royal Gift\n\n(Id = 0 will exit)\n\n";
+	std::cout << "Usage: Type id and name\nExample:\nFile id: 304476\nFile name: NornFriend.mp3\n\n(Id = 0 will exit)\n\n";
 
 	auto client = FileClient();
 	if (client.Connect())
